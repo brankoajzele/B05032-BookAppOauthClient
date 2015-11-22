@@ -11,7 +11,7 @@ require '../../vendor/autoload.php';
 $consumer = $_REQUEST['consumer_id'];
 $callback = $_REQUEST['callback_url'];
 
-session_id('test');
+session_id('BookAppOAuth');
 session_start();
 
 $consumerKey = $_SESSION['oauth_consumer_key'];

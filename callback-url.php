@@ -6,7 +6,7 @@ file_put_contents(
     FILE_APPEND
 );
 
-session_id('test');
+session_id('BookAppOAuth');
 session_start();
 
 $_SESSION['oauth_consumer_key'] = $_POST['oauth_consumer_key'];
