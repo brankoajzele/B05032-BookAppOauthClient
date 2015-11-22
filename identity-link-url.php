@@ -1,14 +1,13 @@
 <?php
 
-//Just a dummy logging
-\file_put_contents(
-    '/tmp/external-book-app.log',
+file_put_contents(
+    'external-book-app.log',
     'identity-link-url.php' . print_r($_POST, true) . print_r($_GET, true),
     FILE_APPEND
 );
 
-$consumerId = $_GET['consumer_id'];
-$callbackUrl = urlencode(urldecode($_GET['success_call_back']));
+$consumerId = $_REQUEST['consumer_id'];
+$callbackUrl = urlencode(urldecode($_REQUEST['success_call_back']));
 
 echo <<<HTML
 <form method="post" action="check-login.php?consumer_id={$consumerId}&callback_url={$callbackUrl}">

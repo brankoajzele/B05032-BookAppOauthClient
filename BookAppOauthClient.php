@@ -13,10 +13,6 @@ use OAuth\OAuth1\Token\TokenInterface;
 
 class BookAppOauthClient extends AbstractService
 {
-    protected $_oauthTokenRequestUrl;
-    protected $_oauthTokenAccessUrl;
-
-    /** @var string|null */
     protected $_oauthVerifier = null;
 
     public function __construct(
@@ -27,15 +23,6 @@ class BookAppOauthClient extends AbstractService
         UriInterface $baseApiUri = null
     )
     {
-        \file_put_contents(
-            '/tmp/external-book-app.log',
-            'BookAppOauthClient.php' . print_r($_POST, true) . print_r($_GET, true),
-            FILE_APPEND
-        );
-
-        $this->_oauthTokenRequestUrl = $credentials->getCallbackUrl() . 'oauth/token/request';
-        $this->_oauthTokenAccessUrl= $credentials->getCallbackUrl() . 'oauth/token/access';
-
         if (!isset($httpClient)) {
             $httpClient = new \OAuth\Common\Http\Client\StreamClient();
         }
@@ -48,54 +35,28 @@ class BookAppOauthClient extends AbstractService
         parent::__construct($credentials, $httpClient, $storage, $signature, $baseApiUri);
     }
 
-    /**
-     * @return UriInterface
-     */
     public function getRequestTokenEndpoint()
     {
-        return new Uri($this->_oauthTokenRequestUrl);
+        return new Uri(MAGENTO_BASE_URL . '/oauth/token/request');
     }
 
-    /**
-     * Returns the authorization API endpoint.
-     *
-     * @throws \OAuth\Common\Exception\Exception
-     */
     public function getAuthorizationEndpoint()
     {
         throw new \OAuth\Common\Exception\Exception(
-            'Magento REST 2-legged Oauth does not support current operation.'
+            'Magento REST API is 2-legged. Current operation is not available.'
         );
     }
 
-    /**
-     * Returns the access token API endpoint.
-     *
-     * @return UriInterface
-     */
     public function getAccessTokenEndpoint()
     {
-        return new Uri($this->_oauthTokenAccessUrl);
+        return new Uri(MAGENTO_BASE_URL . '/oauth/token/access');
     }
 
-    /**
-     * Parses the access token response and returns a TokenInterface.
-     *
-     * @param string $responseBody
-     * @return TokenInterface
-     */
     protected function parseAccessTokenResponse($responseBody)
     {
         return $this->_parseToken($responseBody);
     }
 
-    /**
-     * Parses the request token response and returns a TokenInterface.
-     *
-     * @param string $responseBody
-     * @return TokenInterface
-     * @throws TokenResponseException
-     */
     protected function parseRequestTokenResponse($responseBody)
     {
         $data = $this->_parseResponseBody($responseBody);
@@ -105,13 +66,6 @@ class BookAppOauthClient extends AbstractService
         return $this->_parseToken($responseBody);
     }
 
-    /**
-     * Parse response body and create oAuth token object based on parameters provided.
-     *
-     * @param string $responseBody
-     * @return StdOAuth1Token
-     * @throws TokenResponseException
-     */
     protected function _parseToken($responseBody)
     {
         $data = $this->_parseResponseBody($responseBody);
@@ -126,13 +80,6 @@ class BookAppOauthClient extends AbstractService
         return $token;
     }
 
-    /**
-     * Parse response body and return data in array.
-     *
-     * @param string $responseBody
-     * @return array
-     * @throws \OAuth\Common\Http\Exception\TokenResponseException
-     */
     protected function _parseResponseBody($responseBody)
     {
         if (!is_string($responseBody)) {
@@ -147,16 +94,6 @@ class BookAppOauthClient extends AbstractService
         return $data;
     }
 
-    /**
-     * @override to fix since parent implementation from lib not sending the oauth_verifier when requesting access token
-     * Builds the authorization header for an authenticated API request
-     *
-     * @param string $method
-     * @param UriInterface $uri the uri the request is headed
-     * @param \OAuth\OAuth1\Token\TokenInterface $token
-     * @param $bodyParams array
-     * @return string
-     */
     protected function buildAuthorizationHeaderForAPIRequest(
         $method,
         UriInterface $uri,

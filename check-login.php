@@ -1,42 +1,34 @@
 <?php
 
-require '../vendor/autoload.php';
-
-session_id('BookAppOAuth');
-session_start();
-
-//Just a dummy logging
-\file_put_contents(
-    '/tmp/external-book-app.log',
+file_put_contents(
+    'external-book-app.log',
     'check-login.php' . print_r($_POST, true) . print_r($_GET, true),
     FILE_APPEND
 );
 
-/**
- * Here we can do a username/password check on External Book App side,
- * and possibly do something with the $_GET['consumer_id']; which gets passed to this file.
- *
- * If External Book App username/password checks fine, we can proceed with OAuth.
- */
+require '../../vendor/autoload.php';
 
-/* Some code here for username/password check on External Book App side */
+$consumer = $_REQUEST['consumer_id'];
+$callback = $_REQUEST['callback_url'];
 
-/* Progressing further with OAuth */
+session_id('test');
+session_start();
 
-$credentials = new \OAuth\Common\Consumer\Credentials(
-    $_SESSION['oauth_consumer_key'],
-    $_SESSION['oauth_consumer_secret'],
-    $_SESSION['store_base_url']
-);
+$consumerKey = $_SESSION['oauth_consumer_key'];
+$consumerSecret = $_SESSION['oauth_consumer_secret'];
+$magentoBaseUrl = rtrim($_SESSION['store_base_url'], '/');
+$oauthVerifier = $_SESSION['oauth_verifier'];
 
-$oauthClient = new OauthClient($credentials);
+define('MAGENTO_BASE_URL', $magentoBaseUrl);
 
-$requestToken = $oauthClient->requestRequestToken();
+$credentials = new \OAuth\Common\Consumer\Credentials($consumerKey, $consumerSecret, $magentoBaseUrl);
+$oAuthClient = new BookAppOauthClient($credentials);
+$requestToken = $oAuthClient->requestRequestToken();
 
-$accessToken = $oauthClient->requestAccessToken(
+$accessToken = $oAuthClient->requestAccessToken(
     $requestToken->getRequestToken(),
     $oauthVerifier,
     $requestToken->getRequestTokenSecret()
 );
 
-header('Location: ' . $_GET['callback_url']);
+header('Location: '. $callback);
