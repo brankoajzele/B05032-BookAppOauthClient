@@ -6,11 +6,11 @@ file_put_contents(
     FILE_APPEND
 );
 
-$consumerId = $_REQUEST['consumer_id'];
+$consumerKey = $_REQUEST['oauth_consumer_key'];
 $callbackUrl = urlencode(urldecode($_REQUEST['success_call_back']));
 
 echo <<<HTML
-<form method="post" action="check-login.php?consumer_id={$consumerId}&callback_url={$callbackUrl}">
+<form method="post" action="check-login.php?consumer_key={$consumerKey}&callback_url={$callbackUrl}">
     <p>External Book App Login</p>
     <input type="text" name="username" id="username" placeholder="Username">
     <input type="password" name="password" id="password" placeholder="Password">
