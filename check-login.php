@@ -8,7 +8,7 @@ file_put_contents(
 
 require '../../vendor/autoload.php';
 
-$consumer = $_REQUEST['consumer_id'];
+$consumer = $_REQUEST['consumer_key'];
 $callback = $_REQUEST['callback_url'];
 
 session_id('BookAppOAuth');
